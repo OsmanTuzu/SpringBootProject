@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>Customer Management System </title>
+		<link rel="stylesheet" 
+			href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" 
+			integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
+			crossorigin="anonymous">
+		<style>
+			
+        
+        	.is-invalid {
+            	border-color: #dc3545; /* Kırmızı renk */
+        	}
+
+        
+        	.is-valid {
+            	border-color: #28a745; /* Yeşil renk */
+        	}
+    	</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-6 container justify-content-center card">
+					<h1 class="text-center"> Create New Customer</h1>
+					<div class="card-body">
+						<form th:action="@{/customers}" th:object = "${customer}" method="post">
+							<div class="form-group">
+    							<label for="firstName">İsim</label>
+    							<input
+        						type="text"
+        						id="firstName"
+        						name="firstName"
+        						th:field="*{firstName}"
+        						class="form-control"
+        						placeholder="Adınızı giriniz"
+    							/>
+    							<small class="text-danger" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></small>
+    							<small class="text-danger" th:if="${#fields.hasErrors('firstName')}">İsim kısmı boş olamaz</small>
+							</div>
+							
+							<div class="form-group">
+								<label>Soyisim</label>
+								<input
+								type="text"
+								name="lastName"
+								th:field = "*{lastName}"
+								class="form-control"
+								placeholder="Soyadınızı giriniz"
+								/>
+								
+							</div>
+							
+							<div class="form-group">
+								<label>Email</label>
+								<input
+								type="text"
+								name="email"
+								th:field = "*{email}"
+								class="form-control"
+								placeholder="Email adresinizi giriniz"
+								/>
+								
+							</div>
+							
+							<div class="form-group">
+								<label>Şehir</label>
+								<select name="city" th:field="*{city}" class="form-control">
+    								<option value="" disabled selected>Şehir Seçiniz</option>
+    								<option th:each="city : ${cities}" th:value="${city.id}" th:text="${city.name}"></option>
+								</select>
+							</div>
+
+
+
+							
+							
+							
+							<div class="form-group">
+    							<label>Müşteri TCKN</label>
+    							<input 
+    							type="text" 
+    							name="tckn" 
+    							th:field="*{tckn}" 
+    							id="tcknInput"
+    							class="form-control" 
+    							placeholder="TCKN giriniz"
+    							/>
+    							<small class="text-danger" th:if="${#fields.hasErrors('tckn')}" th:errors="*{tckn}"></small>
+							</div>
+							
+							<script>
+    							var tcknInput = document.getElementById("tcknInput");
+
+    							tcknInput.addEventListener("input", function() {
+        							var tcknLength = this.value.length;
+
+        							if (tcknLength === 11) {
+            							this.classList.add("is-valid");
+            							this.classList.remove("is-invalid");
+        							} else {
+            							this.classList.remove("is-valid");
+            							this.classList.add("is-invalid");
+        							}
+    							});
+							</script>
+							
+							
+							<div id="vehicleFields">
+        						<div class="vehicle">
+            						<h4>Araç Bilgileri</h4>
+            						<div class="form-group">
+                						<label>Plaka No</label>
+                						<input type="text" name="vehicles[0].plakaNo" th:field="*{vehicles[0].plakaNo}" class="form-control" placeholder="Araç markası"/>
+            						</div>
+            						
+            						<div class="form-group">
+    									<label>Marka</label>
+    									<select id="brandSelect" name="vehicles[0].brand" th:field="*{vehicles[0].brand}" class="form-control">
+        									<option value="BMW">BMW</option>
+        									<option value="MERCEDES">Mercedes</option>
+        									<option value="AUDI">Audi</option>
+    									</select>
+            						</div>
+            						<div class="form-group">
+    									<label for="modelSelect">Model Seçin</label>
+    									<select id="modelSelect" name="vehicles[0].model" th:field="*{vehicles[0].model}" class="form-control">
+        									
+
+    									</select>
+    									<script th:inline="javascript">
+    										var modelSelect = document.getElementById("modelSelect");
+    										var brandSelect = document.getElementById("brandSelect");
+
+    										brandSelect.addEventListener("change", function() {
+        										var selectedBrand = this.value;
+        										modelSelect.innerHTML = ""; 
+        										var models = {
+            										BMW: ["M3", "M5"],
+            										MERCEDES: ["CLA", "S"],
+            										AUDI: ["RS6", "A5"]
+        										};
+        										models[selectedBrand].forEach(function(model) {
+            										var option = document.createElement("option");
+            										option.value = model;
+            										option.textContent = model;
+            										modelSelect.appendChild(option);
+        										});
+    											});
+											</script>
+									</div>
+            						<div class="form-group">
+                						<label>Üretim Yılı</label>
+                						<input type="number" name="vehicles[0].productionYear" th:field="*{vehicles[0].productionYear}" class="form-control" placeholder="Üretim yılı"/>
+            						</div>
+        						</div>
+    						</div>
+    
+    						<button type="button" id="addVehicleButton" class="btn btn-primary">Araç Ekle</button>
+    						<button type="submit" class="btn btn-primary">Müşteriyi Kaydet</button>
+						</form>
+						
+						<script>
+    						const addVehicleButton = document.getElementById('addVehicleButton');
+							const vehicleFields = document.getElementById('vehicleFields');
+
+							let vehicleCount = 1;
+
+							addVehicleButton.addEventListener('click', () => {
+    							const vehicleDiv = document.createElement('div');
+    							vehicleDiv.className = 'vehicle';
+    							vehicleDiv.innerHTML = `
+        							<h4>Araç Bilgileri</h4>
+        							<div class="form-group">
+            							<label>Plaka No</label>
+            							<input type="text" name="vehicles[${vehicleCount}].plakaNo" th:field="*{vehicles[${vehicleCount}].plakaNo}" class="form-control" placeholder="Araç markası"/>
+        							</div>
+        							<div class="form-group">
+            							<label>Marka</label>
+            							<select id="brandSelect${vehicleCount}" name="vehicles[${vehicleCount}].brand" th:field="*{vehicles[${vehicleCount}].brand}" class="form-control">
+                							<option value="BMW">BMW</option>
+                							<option value="MERCEDES">Mercedes</option>
+                							<option value="AUDI">Audi</option>
+            							</select>
+        							</div>
+        							<div class="form-group">
+            							<label>Model</label>
+            							<select id="modelSelect${vehicleCount}" name="vehicles[${vehicleCount}].model" th:field="*{vehicles[${vehicleCount}].model}" class="form-control"></select>
+        							</div>
+        							<div class="form-group">
+            							<label>Üretim Yılı</label>
+            							<input type="number" name="vehicles[${vehicleCount}].productionYear" th:field="*{vehicles[${vehicleCount}].productionYear}" class="form-control" placeholder="Üretim yılı"/>
+        							</div>
+    `							;
+    							vehicleFields.appendChild(vehicleDiv);
+
+    							const brandSelect = document.getElementById(`brandSelect${vehicleCount}`);
+    							const modelSelect = document.getElementById(`modelSelect${vehicleCount}`);
+
+    							brandSelect.addEventListener('change', function() {
+        							const selectedBrand = this.value;
+        							modelSelect.innerHTML = "";
+        							const models = {
+            							BMW: ["M3", "M5"],
+            							MERCEDES: ["CLA", "S"],
+            							AUDI: ["RS6", "A5"]
+        							};
+        							models[selectedBrand].forEach(function(model) {
+            							const option = document.createElement("option");
+            							option.value = model;
+            							option.textContent = model;
+            							modelSelect.appendChild(option);
+        							});
+    							});
+
+    							vehicleCount++;
+							});
+
+
+						</script>
+						
+						
+						
+					</div>
+					
+				</div>
+				
+			</div>
+			
+		</div>
+		
+	</body>
+</html>

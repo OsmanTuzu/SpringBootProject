@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>customer Management System</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 container justify-content-center card">
+            <h1 class="text-center">Müşteri Güncelleme ve Poliçe Görüntüleme</h1>
+            <div class="card-body">
+				
+                <!-- Çalışan bilgilerini gösterme döngüsü -->
+                <div>
+    				<span th:text="${customer.firstName} + ' ' + ${customer.lastName} + ': Poliçe Prim Bedeli: ' + ${customer.creditScore}"></span>
+				</div>
+                <!-- Form başlangıcı -->
+                <form th:action="@{/customers/{id} (id=${customer.id})}" th:object="${customer}" method="post">
+                    <!-- Form alanları -->
+                    <div class="form-group">
+                        <label>İsim</label>
+                        <input type="text" name="firstName" th:field="*{firstName}" class="form-control" placeholder="Enter customer first name"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Soyisim</label>
+                        <input type="text" name="lastName" th:field="*{lastName}" class="form-control" placeholder="Enter customer last name"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="text" name="email" th:field="*{email}" class="form-control" placeholder="Enter customer email"/>
+                    </div>             
+                    <div class="form-group">
+    					<label>TCKN</label>
+    					<input type="text" name="tckn" th:value="${customer.tckn}" class="form-control" readonly="readonly"/>
+					</div>
+
+                              
+                    <div class="footer-body">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
